@@ -1,6 +1,6 @@
 ## Genome assembly
 
-Usage: ./genome_assembly.sh <input_file> <output_directory> <fermi_timeout_sec>  
+Usage: ./genome_assembly.sh input_file output_directory fermi_timeout_sec  
 Ex: ./genome_assembly.sh input.fna output 40
 
 This implementation handles all combinations of cases:  
