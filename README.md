@@ -16,6 +16,12 @@ This implementation handles all combinations of cases:
 For certain values fermi remains blocked so this program expects a timeout after which the process is killed.
 If the process finishes successfully, a counts report is generated to output/report.txt 
 
+### Prerequisites
+- idba package available in classpath  
+- run_fermi.pl and fermi _executables_ on the same level as genome_assembly.sh
+
+
+
 
 
 
