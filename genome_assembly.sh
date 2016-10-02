@@ -29,7 +29,7 @@ validate_input()
     exit 64
   fi
 
-  if [ -z $input_file ] || [ ! -f $input_file ];
+  if [ -z "$input_file" ] || [ ! -f "$input_file" ];
   then
     echo "Please provide input.fna file next to this script"
     exit 64
@@ -105,19 +105,21 @@ handle_single_reads ()
     ../../run-fermi.pl -ct8 -e ../../fermi sim_reads.fa >fmdef.mak
     make -f fmdef.mak -j 8 > fmdef.log 2>&1 &
 
-    printf "\n###############\n Single read: $1 $2 read length $3 depth $4 error $5 :\n" >> ../report.txt
 
     #Sometimes fermi remains blocked, blocking the entire program
     #If fermi doesn't finish in $fermi_timeout seconds => kill the process and move on
     
     TASK_PID=$!
-    sleep $fermi_timeout
-    if ps -p $TASK_PID > /dev/null
+    sleep $fermi_timeout && kill -9 $TASK_PID &
+    wait $TASK_PID
+
+    fermi_output="fmdef.p5.fq.gz" 
+    if [ ! -f $fermi_output ]; 
     then
-      kill -9 $TASK_PID
-      echo "Failed to execute FERMI for $1 $2 read length $3 depth $4 error $5" >> ../sim_reads_errors.log
+      echo "Failed to execute FERMI for $1 $2 read length $3 depth $4 error $5" >> ../fermi_errors.log
     else
       #the process completed successfully
+    printf "\n###############\n>Single read: $1 bp:$2 depth:$3 error:$4 :\n" >> ../report.txt
       raw_n50 fmdef.p5.fq.gz >> ../report.txt
     fi
 
@@ -136,7 +138,7 @@ handle_paired_reads ()
   if [ -s sim_reads.fa ]; then
     #use idba_ud
     idba_ud -r sim_reads.fa -o idba_ud
-    printf "\n###############\n Paired read: $1 $2 read length $3 depth $4 error $5 :\n" >> ../report.txt
+    printf "\n###############\n>Paired read: $1 bp:$2 depth:$3 error:$4 :\n" >> ../report.txt
     raw_n50 idba_ud/contig.fa >> ../report.txt
   else
     echo "Failed to execute sim reads for $1 $2 read length $3 depth $4 error $5" >> ../sim_reads_errors.log
